@@ -78,6 +78,7 @@ h2#status {
     font-size: clamp(2.5rem, 15vw, 5rem);
     font-weight: 700;
     cursor: pointer;
+    user-select: none; /* কি-বোর্ড আসা বন্ধ করতে সাহায্য করে */
     transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
