@@ -1,152 +1,151 @@
-                                                                                                <!DOCTYPE html>
-                                                                                                <html lang="bn">
-                                                                                                <head>
-                                                                                                    <meta charset="UTF-8">
-                                                                                                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                                                                                                    <title>Game Room | Tic Tac Toe</title>
-                                                                                                    <link rel="stylesheet" href="/style.css">
-                                                                                                </head>
-                                                                                                <body>
-                                                                                                    <div class="container">
-                                                                                                        <h2 id="status">Connecting...</h2>
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Room | Tic Tac Toe</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <h2 id="status">Connecting...</h2>
 
-                                                                                                        <div id="scoreBoard" style="display:none; margin-top: 1rem;">
-                                                                                                           <h3 style="font-weight: 500;">Score: <span style="color:var(--color-x)">X</span> - <span id="scoreX">0</span> | <span style="color:var(--color-o)">O</span> - <span id="scoreO">0</span></h3>
-                                                                                                        </div>
+        <div id="scoreBoard" style="display:none; margin-top: 1rem;">
+           <h3 style="font-weight: 500;">Score: <span style="color:var(--color-x)">X</span> - <span id="scoreX">0</span> | <span style="color:var(--color-o)">O</span> - <span id="scoreO">0</span></h3>
+        </div>
 
-                                                                                                        <div class="board" style="display:none;">
-                                                                                                            <% for(let i=0; i<9; i++) { %>
-                                                                                                                <div class="cell" data-index="<%= i %>"><span></span></div>
-                                                                                                            <% } %>
-                                                                                                        </div>
+        <div class="board" style="display:none;">
+            <% for(let i=0; i<9; i++) { %>
+                <div class="cell" data-index="<%= i %>" inputmode="none"><span></span></div>
+            <% } %>
+        </div>
 
-                                                                                                        <div id="lobbyScreen" style="display:none;">
-                                                                                                            <h3>Waiting for opponent...</h3>
-                                                                                                            <p style="color: var(--text-secondary); font-size: 0.9rem;">Share this link to invite:</p>
-                                                                                                            <code id="roomLink"></code>
-                                                                                                            <button id="copyBtn">Copy Link</button>
-                                                                                                            <p id="copyFeedback" style="height: 1em; color: var(--accent-primary);"></p>
-                                                                                                        </div>
+        <div id="lobbyScreen" style="display:none;">
+            <h3>Waiting for opponent...</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">Share this link to invite:</p>
+            <code id="roomLink"></code>
+            <button id="copyBtn">Copy Link</button>
+            <p id="copyFeedback" style="height: 1em; color: var(--accent-primary);"></p>
+        </div>
 
-                                                                                                        <div id="gameOverScreen" style="display:none;">
-                                                                                                            <h2 id="winnerText"></h2>
-                                                                                                            <button id="playAgainBtn">Play Again</button>
-                                                                                                            <a href="/"><button>Go Home</button></a>
-                                                                                                        </div>
-                                                                                                    </div>
+        <div id="gameOverScreen" style="display:none;">
+            <h2 id="winnerText"></h2>
+            <button id="playAgainBtn">Play Again</button>
+            <a href="/"><button>Go Home</button></a>
+        </div>
+    </div>
 
-                                                                                                    <footer>
-                                                                                                        Developed with ❤️ by <a href="https://www.facebook.com/M.Shuddho" target="_blank">Umayer Rahaman</a>
-                                                                                                    </footer>
+    <footer>
+        Developed with ❤️ by <a href="https://www.facebook.com/M.Shuddho" target="_blank">Umayer Rahaman</a>
+    </footer>
 
-                                                                                                    <script src="/socket.io/socket.io.js"></script>
-                                                                                                    <script>
-                                                                                                        const socket = io();
-                                                                                                        const roomId = "<%= roomId %>";
-                                                                                                        const ui = {
-                                                                                                            status: document.getElementById('status'),
-                                                                                                            scoreBoard: document.getElementById('scoreBoard'),
-                                                                                                            board: document.querySelector('.board'),
-                                                                                                            lobby: document.getElementById('lobbyScreen'),
-                                                                                                            gameOver: document.getElementById('gameOverScreen'),
-                                                                                                            winnerText: document.getElementById('winnerText'),
-                                                                                                            scoreX: document.getElementById('scoreX'),
-                                                                                                            scoreO: document.getElementById('scoreO'),
-                                                                                                            cells: document.querySelectorAll('.cell'),
-                                                                                                            copyBtn: document.getElementById('copyBtn'),
-                                                                                                            roomLink: document.getElementById('roomLink'),
-                                                                                                            copyFeedback: document.getElementById('copyFeedback')
-                                                                                                        };
-                                                                                                        let mySymbol = '';
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const roomId = "<%= roomId %>";
+        const ui = {
+            status: document.getElementById('status'),
+            scoreBoard: document.getElementById('scoreBoard'),
+            board: document.querySelector('.board'),
+            lobby: document.getElementById('lobbyScreen'),
+            gameOver: document.getElementById('gameOverScreen'),
+            winnerText: document.getElementById('winnerText'),
+            scoreX: document.getElementById('scoreX'),
+            scoreO: document.getElementById('scoreO'),
+            cells: document.querySelectorAll('.cell'),
+            copyBtn: document.getElementById('copyBtn'),
+            roomLink: document.getElementById('roomLink'),
+            copyFeedback: document.getElementById('copyFeedback')
+        };
+        let mySymbol = '';
 
-                                                                                                        socket.emit('joinRoom', roomId);
+        socket.emit('joinRoom', roomId);
+        
+        ui.copyBtn.onclick = () => {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                ui.copyFeedback.innerText = 'Copied!';
+                setTimeout(() => ui.copyFeedback.innerText = '', 2000);
+            });
+        };
 
-                                                                                                        ui.copyBtn.onclick = () => {
-                                                                                                            navigator.clipboard.writeText(window.location.href).then(() => {
-                                                                                                                ui.copyFeedback.innerText = 'Copied!';
-                                                                                                                setTimeout(() => ui.copyFeedback.innerText = '', 2000);
-                                                                                                            });
-                                                                                                        };
+        ui.cells.forEach(cell => {
+            cell.addEventListener('click', () => socket.emit('makeMove', cell.dataset.index));
+        });
+        document.getElementById('playAgainBtn').onclick = () => socket.emit('playAgain');
+        
+        const showView = (view) => {
+            ['scoreBoard', 'board', 'lobby', 'gameOver'].forEach(v => ui[v].style.display = 'none');
+            if (view === 'game') {
+                ui.scoreBoard.style.display = 'block';
+                ui.board.style.display = 'grid';
+                ui.board.style.pointerEvents = 'auto';
+            } else if (view) {
+                ui[view].style.display = 'block';
+            }
+        };
 
-                                                                                                        ui.cells.forEach(cell => {
-                                                                                                            cell.addEventListener('click', () => socket.emit('makeMove', cell.dataset.index));
-                                                                                                        });
-                                                                                                        document.getElementById('playAgainBtn').onclick = () => socket.emit('playAgain');
+        socket.on('showLobby', () => {
+            ui.roomLink.innerText = window.location.href;
+            ui.status.style.display = 'none';
+            showView('lobby');
+        });
 
-                                                                                                        const showView = (view) => {
-                                                                                                            ['scoreBoard', 'board', 'lobby', 'gameOver'].forEach(v => ui[v].style.display = 'none');
-                                                                                                            if (view === 'game') {
-                                                                                                                ui.scoreBoard.style.display = 'block';
-                                                                                                                ui.board.style.display = 'grid';
-                                                                                                                ui.board.style.pointerEvents = 'auto';
-                                                                                                            } else if (view) {
-                                                                                                                ui[view].style.display = 'block';
-                                                                                                            }
-                                                                                                        };
+        socket.on('startGame', ({ turn, board, score }) => {
+            ui.status.style.display = 'block';
+            showView('game');
+            updateBoard(board);
+            updateScore(score);
+            ui.status.innerText = (turn === mySymbol) ? "Your Turn" : `Opponent's Turn`;
+        });
+        
+        socket.on('assignSymbol', (symbol) => mySymbol = symbol);
+        socket.on('updateBoard', ({ board }) => updateBoard(board));
+        socket.on('nextTurn', (turn) => {
+            ui.status.innerText = (turn === mySymbol) ? "Your Turn" : `Opponent's Turn`;
+        });
 
-                                                                                                        socket.on('showLobby', () => {
-                                                                                                            ui.roomLink.innerText = window.location.href;
-                                                                                                            ui.status.style.display = 'none';
-                                                                                                            showView('lobby');
-                                                                                                        });
+        socket.on('gameOver', ({ winner, score }) => {
+            ui.status.style.display = 'none';
+            updateScore(score);
+            showView('gameOver');
+            ui.winnerText.innerText = winner ? (winner === mySymbol ? 'You Won! 🎉' : 'You Lost 😔') : "It's a Draw!";
+            ui.board.style.pointerEvents = 'none';
+        });
 
-                                                                                                        socket.on('startGame', ({ turn, board, score }) => {
-                                                                                                            ui.status.style.display = 'block';
-                                                                                                            showView('game');
-                                                                                                            updateBoard(board);
-                                                                                                            updateScore(score);
-                                                                                                            ui.status.innerText = (turn === mySymbol) ? "Your Turn" : `Opponent's Turn`;
-                                                                                                        });
+        socket.on('errorMsg', (msg) => {
+            alert(msg);
+            window.location.href = '/';
+        });
 
-                                                                                                        socket.on('assignSymbol', (symbol) => mySymbol = symbol);
-                                                                                                        socket.on('updateBoard', ({ board }) => updateBoard(board));
-                                                                                                        socket.on('nextTurn', (turn) => {
-                                                                                                            ui.status.innerText = (turn === mySymbol) ? "Your Turn" : `Opponent's Turn`;
-                                                                                                        });
+        socket.on('opponentLeft', () => {
+            showView(null);
+            ui.status.style.display = 'block';
+            ui.status.innerText = 'Opponent left. Redirecting home...';
+            ui.status.classList.add('status-notification');
+            ui.board.style.pointerEvents = 'none';
 
-                                                                                                        socket.on('gameOver', ({ winner, score }) => {
-                                                                                                            ui.status.style.display = 'none';
-                                                                                                            updateScore(score);
-                                                                                                            showView('gameOver');
-                                                                                                            ui.winnerText.innerText = winner ? (winner === mySymbol ? 'You Won! 🎉' : 'You Lost 😔') : "It's a Draw!";
-                                                                                                            ui.board.style.pointerEvents = 'none';
-                                                                                                        });
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 4000);
+        });
 
-                                                                                                        socket.on('errorMsg', (msg) => {
-                                                                                                            alert(msg);
-                                                                                                            window.location.href = '/';
-                                                                                                        });
-
-                                                                                                        socket.on('opponentLeft', () => {
-                                                                                                            showView(null);
-                                                                                                            ui.status.style.display = 'block';
-                                                                                                            ui.status.innerText = 'Opponent left. Redirecting home...';
-                                                                                                            ui.status.classList.add('status-notification');
-                                                                                                            ui.board.style.pointerEvents = 'none';
-
-                                                                                                            setTimeout(() => {
-                                                                                                                window.location.href = '/';
-                                                                                                            }, 4000);
-                                                                                                        });
-
-                                                                                                        // পরিবর্তন ২: updateBoard ফাংশনটি আপডেট করা হলো
-                                                                                                        const updateBoard = (boardData) => {
-                                                                                                            ui.cells.forEach((cell, i) => {
-                                                                                                                const span = cell.querySelector('span');
-                                                                                                                if(span) {
-                                                                                                                    span.innerText = boardData[i];
-                                                                                                                }
-                                                                                                                cell.classList.remove('X', 'O');
-                                                                                                                if (boardData[i]) {
-                                                                                                                    cell.classList.add(boardData[i]);
-                                                                                                                }
-                                                                                                            });
-                                                                                                        };
-
-                                                                                                        const updateScore = (score) => {
-                                                                                                            ui.scoreX.innerText = score.X;
-                                                                                                            ui.scoreO.innerText = score.O;
-                                                                                                        };
-                                                                                                    </script>
-                                                                                                </body>
-                                                                                                </html>
+        const updateBoard = (boardData) => {
+            ui.cells.forEach((cell, i) => {
+                const span = cell.querySelector('span');
+                if(span) {
+                    span.innerText = boardData[i];
+                }
+                cell.classList.remove('X', 'O');
+                if (boardData[i]) {
+                    cell.classList.add(boardData[i]);
+                }
+            });
+        };
+        
+        const updateScore = (score) => {
+            ui.scoreX.innerText = score.X;
+            ui.scoreO.innerText = score.O;
+        };
+    </script>
+</body>
+</html>
