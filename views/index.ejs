@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe - Online</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Tic <span>Tac</span> Toe</h1>
+        <h3>Online Multiplayer</h3>
+        <div style="margin-top: 2rem;">
+            <button id="createRoomBtn">Create New Game</button>
+            <h3 style="margin: 1rem 0;">or</h3>
+            <input id="joinRoomInput" type="text" placeholder="Enter Room ID">
+            <br>
+            <button id="joinRoomBtn">Join Room</button>
+        </div>
+    </div>
+
+    <footer>
+        Developed with ❤️ by <a href="https://www.facebook.com/M.Shuddho" target="_blank">Umayer Rahaman</a>
+    </footer>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        document.getElementById('createRoomBtn').onclick = () => {
+            socket.emit('createRoom');
+        };
+
+        document.getElementById('joinRoomBtn').onclick = () => {
+            const roomId = document.getElementById('joinRoomInput').value.trim();
+            if (roomId) {
+                window.location.href = `/room/${roomId}`;
+            }
+        };
+
+        socket.on('roomCreated', (roomId) => {
+            window.location.href = `/room/${roomId}`;
+        });
+    </script>
+</body>
+</html>
